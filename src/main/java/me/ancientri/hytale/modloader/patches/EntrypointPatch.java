@@ -15,9 +15,11 @@ import java.util.function.Function;
 
 public class EntrypointPatch extends GamePatch {
 	private final String lateMain;
+	private final String server;
 
-	public EntrypointPatch(String lateMain) {
+	public EntrypointPatch(String lateMain, String server) {
 		this.lateMain = lateMain;
+		this.server = server;
 	}
 
 	@Override
@@ -31,18 +33,30 @@ public class EntrypointPatch extends GamePatch {
 		if (mainMethod == null) {
 			throw new RuntimeException("Could not find `lateMain` method in class `" + lateMain + "`!");
 		}
+
+		ClassNode serverClass = classSource.apply(server);
+		if (serverClass == null) {
+			throw new RuntimeException("Could not load server class `" + server + "`!");
+		}
+
+		MethodNode serverBootMethod = findMethod(serverClass, methodNode -> methodNode.name.equals("boot"));
+		if (serverBootMethod == null) {
+			throw new RuntimeException("Could not find `boot` method in class `" + server + "`!");
+		}
 		var iterator = mainMethod.instructions.iterator();
 
 		patchPreInit(mainMethod, iterator);
+		patchPostInit(serverBootMethod, iterator);
 
 		classEmitter.accept(mainClass);
 	}
 
-	private MethodInsnNode findStaticMethodCall(MethodNode methodNode, String methodName) {
+	private MethodInsnNode findInvokeVirtualCall(MethodNode methodNode, String ownerName, String methodName) {
 		var node = findInsn(methodNode,
 				abstractInsnNode ->
 						abstractInsnNode instanceof MethodInsnNode methodInsnNode
-								&& methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC
+								&& methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL
+								&& methodInsnNode.owner.equals(ownerName)
 								&& methodInsnNode.name.equals(methodName)
 				, false);
 
@@ -77,5 +91,13 @@ public class EntrypointPatch extends GamePatch {
 		moveBefore(iterator, node);
 		var preInitCall = createStaticMethodCall("preInit");
 		iterator.add(preInitCall);
+	}
+
+	private void patchPostInit(MethodNode mainMethod, ListIterator<AbstractInsnNode> iterator) {
+		// INVOKEVIRTUAL com/hypixel/hytale/server/core/io/ServerManager.waitForBindComplete ()V
+		var node = findInvokeVirtualCall(mainMethod, "com/hypixel/hytale/server/core/io/ServerManager", "waitForBindComplete");
+		moveAfter(iterator, node);
+		var postInitCall = createStaticMethodCall("postInit");
+		iterator.add(postInitCall);
 	}
 }

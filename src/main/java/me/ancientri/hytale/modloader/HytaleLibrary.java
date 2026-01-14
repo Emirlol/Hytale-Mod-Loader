@@ -5,7 +5,8 @@ import net.fabricmc.loader.impl.game.LibClassifier.LibraryType;
 
 public enum HytaleLibrary implements LibraryType {
 	MAIN("com/hypixel/hytale/Main.class"),
-	LATE_MAIN("com/hypixel/hytale/LateMain.class");
+	LATE_MAIN("com/hypixel/hytale/LateMain.class"),
+	SERVER("com.hypixel.hytale.server.core.HytaleServer.class");
 
 	private final String[] paths;
 

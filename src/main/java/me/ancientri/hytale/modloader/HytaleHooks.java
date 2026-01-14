@@ -5,7 +5,6 @@ import net.fabricmc.loader.impl.FabricLoaderImpl;
 
 import java.io.File;
 
-
 public class HytaleHooks {
 	public static final String INTERNAL_NAME = HytaleHooks.class.getName().replace('.', '/');
 
@@ -17,18 +16,9 @@ public class HytaleHooks {
 		loader.invokeEntrypoints("preInit", ModInitializer.class, ModInitializer::onInitialize);
 	}
 
-//	public static void init() {
-//		FabricLoaderImpl loader = FabricLoaderImpl.INSTANCE;
-//		loader.invokeEntrypoints("init", ModInitializer.class, ModInitializer::onInitialize);
-//	}
-//
-//	public static void initResources() {
-//		FabricLoaderImpl loader = FabricLoaderImpl.INSTANCE;
-//		loader.invokeEntrypoints("initResources", ModInitializer.class, ModInitializer::onInitialize);
-//	}
-//
-//	public static void postInit() {
-//		FabricLoaderImpl loader = FabricLoaderImpl.INSTANCE;
-//		loader.invokeEntrypoints("postInit", ModInitializer.class, ModInitializer::onInitialize);
-//	}
+	@SuppressWarnings("unused") // The call to this method is injected into the game itself
+	public static void postInit() {
+		FabricLoaderImpl loader = FabricLoaderImpl.INSTANCE;
+		loader.invokeEntrypoints("postInit", ModInitializer.class, ModInitializer::onInitialize);
+	}
 }

@@ -27,14 +27,13 @@ import java.util.*;
 public class HytaleGameProvider implements GameProvider {
 
 	static {
-		// This comes before `initialize`, so we can make sure all logs are formatted correctly by doing this early.
-		// Putting this in `initialize` makes the first line use fabric's default logger format.
 		System.setProperty("java.util.logging.manager", "com.hypixel.hytale.logger.backend.HytaleLogManager");
 	}
 
 	private Arguments arguments;
 	private String main;
 	private String lateMain;
+	private String server;
 	private HytaleMetadataLookup metadataLookup;
 	private Path gameJar;
 	private Collection<Path> validParentClassPath; // computed parent class path restriction (loader+deps)
@@ -158,6 +157,7 @@ public class HytaleGameProvider implements GameProvider {
 			gameJar = classifier.getOrigin(gameLib);
 			main = classifier.getClassName(gameLib);
 			lateMain = classifier.getClassName(HytaleLibrary.LATE_MAIN);
+			server = classifier.getClassName(HytaleLibrary.SERVER);
 			validParentClassPath = classifier.getSystemLibraries();
 		} catch (IOException e) {
 			throw ExceptionUtil.wrap(e);
@@ -166,7 +166,7 @@ public class HytaleGameProvider implements GameProvider {
 		if (gameJar == null) throw new RuntimeException("Unable to locate game jar!");
 		else {
 			metadataLookup = new HytaleMetadataLookup(gameJar);
-			transformer = new GameTransformer(new EntrypointPatch(lateMain));
+			transformer = new GameTransformer(new EntrypointPatch(lateMain, server));
 		}
 
 		return true;
