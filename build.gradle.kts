@@ -74,10 +74,10 @@ tasks {
 	}
 	assemble {
 		dependsOn("shadowJar")
-		dependsOn("copyJar")
 	}
 	register<Copy>("copyJar") {
 		group = "build"
+		dependsOn("jar", "shadowJar")
 		from(shadowJar.get().archiveFile)
 		into(gamePath)
 	}
