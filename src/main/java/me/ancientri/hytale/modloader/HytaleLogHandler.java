@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 public class HytaleLogHandler implements LogHandler {
+	// The JIT should constant-fold these, so it's fine
 	private static final MethodHandle GET_LOGGER;
 	private static final MethodHandle AT_LEVEL;
 	private static final MethodHandle WITH_CAUSE;
