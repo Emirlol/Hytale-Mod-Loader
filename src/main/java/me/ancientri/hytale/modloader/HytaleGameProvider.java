@@ -74,10 +74,10 @@ public class HytaleGameProvider implements GameProvider {
 		);
 
 		BuiltinModMetadata.Builder modMetadata = new BuiltinModMetadata.Builder(getGameId(), getNormalizedGameVersion())
-														 .setName(getGameName())
-														 .addAuthor("Hypixel", contactMap)
-														 .setContact(new ContactInformationImpl(contactMap))
-														 .setDescription("Hytale Server");
+				.setName(getGameName())
+				.addAuthor("Hypixel", contactMap)
+				.setContact(new ContactInformationImpl(contactMap))
+				.setDescription("Hytale Server");
 
 		HashMap<String, String> contactMapProvider = new HashMap<>();
 		BuiltinModMetadata.Builder providerMetadata = new BuiltinModMetadata.Builder("hytale-provider", "1.0.0")
