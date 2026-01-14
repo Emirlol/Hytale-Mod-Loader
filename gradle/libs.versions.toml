@@ -1,0 +1,39 @@
+[versions]
+fabricLoader = "0.18.4" # https://github.com/FabricMC/fabric-loader/releases/latest"
+
+guava = "33.0.0-jre"
+gson = "2.9.1"
+
+asm = "9.9"
+
+mixin = "0.17.0+mixin.0.8.7"
+mixinExtras = "0.5.2"
+
+shadow = "9.3.1"
+
+[libraries]
+fabricLoader = { module = "net.fabricmc:fabric-loader", version.ref = "fabricLoader" }
+
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asmAnalysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
+asmCommons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asmTree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asmUtil = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+
+mixin = { module = "net.fabricmc:sponge-mixin", version.ref = "mixin" }
+mixinExtras = { module = "io.github.llamalad7:mixinextras-fabric", version.ref = "mixinExtras" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+
+[bundles]
+asm = [
+    "asm",
+    "asmAnalysis",
+    "asmCommons",
+    "asmTree",
+    "asmUtil",
+]
