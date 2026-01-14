@@ -52,7 +52,7 @@ public class HytaleGameProvider implements GameProvider {
 
 	@Override
 	public String getRawGameVersion() {
-		return metadataLookup.getVersion();
+		return metadataLookup.getRawVersion();
 	}
 
 	@Override
@@ -143,7 +143,6 @@ public class HytaleGameProvider implements GameProvider {
 				if (fabricGameJarPath != null) gameLocations.add(fabricGameJarPath);
 
 				gameLocations.add("./HytaleServer.jar");
-				gameLocations.add("../HytaleServer.jar");
 
 				var gameLocation = gameLocations.stream()
 												.map(Paths::get)
@@ -221,10 +220,7 @@ public class HytaleGameProvider implements GameProvider {
 			targetClass = loader.loadClass(main);
 			MethodHandle invoker = MethodHandles.lookup().findStatic(targetClass, "main", MethodType.methodType(void.class, String[].class));
 			var launchArgs = getLaunchArguments(false);
-			String[] args = new String[launchArgs.length + 1];
-			System.arraycopy(launchArgs, 0, args, 1, launchArgs.length);
-			args[0] = "--assets=./Assets.zip";
-			invoker.invoke((Object[]) args);
+			invoker.invoke((Object[]) launchArgs);
 		} catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
 			throw new RuntimeException("Failed to find the main class invoker!", e);
 		} catch (Throwable e) {
@@ -240,6 +236,10 @@ public class HytaleGameProvider implements GameProvider {
 	@Override
 	public String[] getLaunchArguments(boolean sanitize) {
 		if (arguments == null) return new String[0];
+
+		if (!arguments.containsKey("assets")) {
+			arguments.put("assets", "../Assets.zip");
+		}
 
 		String[] ret = arguments.toArray();
 		if (!sanitize) return ret;

@@ -5,7 +5,6 @@ import net.fabricmc.loader.impl.util.log.LogCategory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -16,6 +15,7 @@ public class HytaleMetadataLookup {
 	private String name = "Hytale";
 	private String title;
 	private String branch;
+	private String rawVersion;
 	private String version;
 	private String revisionId;
 
@@ -39,7 +39,11 @@ Implementation-Version: 2026.01.13-dcad8778f
 				Attributes attributes = manifest.getMainAttributes();
 				this.title = attributes.getValue("Implementation-Title");
 				this.branch = attributes.getValue("Implementation-Branch");
-				this.version = attributes.getValue("Implementation-Version");
+				this.rawVersion = attributes.getValue("Implementation-Version");
+				if (this.rawVersion != null) {
+					this.version = this.rawVersion.replaceAll("\\.0+([1-9])", ".$1") // Removes leading zeroes to match semver.
+												  .replaceAll("-([A-Za-z0-9]+)", "+$1"); // Replaces hyphen before build metadata with plus sign to match semver, otherwise it's a pre-release.
+				}
 				this.revisionId = attributes.getValue("Implementation-Revision-Id"); // The first 9 characters of this are appended to the end of the version
 			}
 		} catch (IOException e) {
@@ -49,6 +53,7 @@ Implementation-Version: 2026.01.13-dcad8778f
 		if (this.title == null || this.version == null || this.branch == null || this.revisionId == null) {
 			Log.error(LogCategory.GAME_PROVIDER, "Incomplete game metadata retrieved from manifest:");
 			Log.error(LogCategory.GAME_PROVIDER, "  Title: " + this.title);
+			Log.error(LogCategory.GAME_PROVIDER, "  Raw version: " + this.rawVersion);
 			Log.error(LogCategory.GAME_PROVIDER, "  Version: " + this.version);
 			Log.error(LogCategory.GAME_PROVIDER, "  Branch: " + this.branch);
 			Log.error(LogCategory.GAME_PROVIDER, "  Revision ID: " + this.revisionId);
@@ -58,6 +63,10 @@ Implementation-Version: 2026.01.13-dcad8778f
 
 	public String getName() {
 		return name + " " + title;
+	}
+
+	public String getRawVersion() {
+		return rawVersion;
 	}
 
 	public String getVersion() {
